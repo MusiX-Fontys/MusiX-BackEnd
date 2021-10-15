@@ -27,14 +27,14 @@ namespace API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // Connection strings for the Identity en MusiX database
+            // Connection strings for the Identity database
 #if DEBUG
             IdentityDatabaseConnectionString = Configuration.GetConnectionString("LocalIdentityDatabaseConnection");
 #else
             IdentityDatabaseConnectionString = Configuration.GetConnectionString("LiveIdentityDatabaseConnection");
 #endif
 
-            /// Allow cors
+            // Allow cors
             services.AddCors(options =>
             {
                 options.AddPolicy("CorsPolicy",
@@ -43,15 +43,15 @@ namespace API
                                   .AllowAnyHeader());
             });
 
-            /// Database connection for identity
+            // Database connection for identity
             services.AddDbContext<IdentityDatabaseContext>(options => options.UseMySql(IdentityDatabaseConnectionString, 
                 ServerVersion.AutoDetect(IdentityDatabaseConnectionString)));
 
-            /// Default identity user
+            // Default identity user
             services.AddIdentity<IdentityUser, IdentityRole>(options =>
             {
-                /// Paswword must be atleast 8 characters long
-                /// must contain a digit, uppercase, lowercase and 1 special character
+                // Paswword must be atleast 8 characters long
+                // must contain a digit, uppercase, lowercase and 1 special character
                 options.Password.RequiredLength = 8;
                 options.Password.RequireDigit = true;
                 options.Password.RequireUppercase = true;

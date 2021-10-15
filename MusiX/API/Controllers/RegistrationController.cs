@@ -18,7 +18,7 @@ namespace API.Controllers
             this.signUpService = signUpService;
         }
 
-        [HttpPost()]
+        [HttpPost]
         [AllowAnonymous]
         public async Task<ActionResult<ApiResponse>> RegistrateAccount([FromBody] RegisterModel model)
         {
