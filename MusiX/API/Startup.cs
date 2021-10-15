@@ -67,7 +67,12 @@ namespace API
             });
 
             //Services
+            services.AddTransient<RegistrationService>();
+
             services.AddTransient<MailService>();
+
+            //Repositories
+            services.AddTransient<RegistrationRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
