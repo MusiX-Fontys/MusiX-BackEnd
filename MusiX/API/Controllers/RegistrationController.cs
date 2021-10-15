@@ -9,6 +9,7 @@ namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [AllowAnonymous]
     public class RegistrationController : ControllerBase
     {
         private readonly RegistrationService signUpService;
@@ -19,8 +20,7 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        [AllowAnonymous]
-        public async Task<ActionResult<ApiResponse>> RegistrateAccount([FromBody] RegisterModel model)
+        public async Task<ActionResult<ApiResponse>> Registrate([FromBody] RegisterModel model)
         {
             if (ModelState.IsValid)
             {
