@@ -10,6 +10,14 @@ using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using API.DataAccess;
+using API.Services;
+using API.DataAccess.Repositories;
+using Newtonsoft.Json;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using API.Utils;
 using System.Threading.Tasks;
 
 namespace API
@@ -27,11 +35,44 @@ namespace API
         public void ConfigureServices(IServiceCollection services)
         {
 
-            services.AddControllers();
+            // JWT setup
+            services.AddAuthentication(x => {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(x => {
+                x.RequireHttpsMetadata = false;
+                x.SaveToken = true;
+                x.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(Configuration["JwtKey"])),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                };
+            });
+
+            // JWT Configuration
+            JwtConfiguration.Init(Configuration);
+
+            services.AddControllers()
+                .AddNewtonsoftJson(options =>
+                {
+                    options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                });
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
             });
+
+            //Services
+            services.AddTransient<RegistrationService>();
+            services.AddTransient<AuthenticationService>();
+
+            services.AddTransient<MailService>();
+
+            //Repositories
+            services.AddTransient<RegistrationRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
