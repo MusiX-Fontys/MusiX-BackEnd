@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Net.Mail;
 
 namespace API.Services
 {
@@ -31,6 +32,19 @@ namespace API.Services
             this.mailService = mailService;
         }
 
+        public bool IsEmailValid(string email)
+        {
+            try
+            {
+                var addr = new MailAddress(email);
+                return addr.Address == email;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         public async Task<bool> DoesEmailExist(string email)
         {
             if (await userManager.FindByEmailAsync(email) != null)
@@ -52,6 +66,7 @@ namespace API.Services
 
             if (result.Succeeded)
             {
+                await userManager.AddToRoleAsync(user, "general");
                 await registrationRepository.AddUserModel(new UserModel { CreationDate = DateTime.Now, UserName = user.UserName, Email = user.Email });
                 mailService.SendUserCreatedMail(user.UserName, user.Email, password);
                 return true;

@@ -11,6 +11,8 @@ using Microsoft.OpenApi.Models;
 using API.DataAccess;
 using API.Services;
 using API.DataAccess.Repositories;
+using System.Threading.Tasks;
+using API.Models;
 
 namespace API
 {
@@ -76,7 +78,7 @@ namespace API
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider serviceProvider)
         {
             app.UseCors("CorsPolicy");
 
@@ -99,6 +101,48 @@ namespace API
             {
                 endpoints.MapControllers();
             });
+
+            Init(serviceProvider).Wait();
+        }
+
+        private static async Task Init(IServiceProvider serviceProvider)
+        {
+            var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            var userManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
+            var database = serviceProvider.GetRequiredService<RegistrationRepository>();
+
+            // Add general role
+            if (!await roleManager.RoleExistsAsync("general"))
+                await roleManager.CreateAsync(new IdentityRole("general"));
+
+            // Add administrator role
+            if (!await roleManager.RoleExistsAsync("administrator"))
+                await roleManager.CreateAsync(new IdentityRole("administrator"));
+
+            // Create admin identity user
+            if (await userManager.FindByNameAsync("admin") == null)
+            {
+                var user = new IdentityUser
+                {
+                    Email = "fontys.musix@gmail.com",
+                    UserName = "admin"
+                };
+
+                await userManager.CreateAsync(user, password: "AbC1@DeF");
+
+                // Add admin identity user to administrator role
+                await userManager.AddToRoleAsync(user, "administrator");
+            }
+
+            // Create admin musix user
+            if (await database.GetUserModelByUsername("admin") == null)
+            {
+                await database.AddUserModel(new UserModel
+                {
+                    CreationDate = DateTime.Now,
+                    UserName = "admin",
+                    Email = "fontys.musix@gmail.com"
+                });
         }
     }
 }

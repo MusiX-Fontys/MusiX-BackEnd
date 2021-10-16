@@ -30,6 +30,9 @@ namespace API.Controllers
                     UserName = model.UserName.Trim()
                 };
 
+                if (!signUpService.IsEmailValid(user.Email))
+                    return BadRequest(ApiResponse.Error("Not valid email submitted."));
+
                 if (await signUpService.DoesEmailExist(user.Email))
                     return BadRequest(ApiResponse.Error("There already exists an account with this email."));
 
