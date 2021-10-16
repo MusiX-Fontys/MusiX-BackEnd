@@ -143,6 +143,7 @@ namespace API
                     UserName = "admin",
                     Email = "fontys.musix@gmail.com"
                 });
+            }
         }
     }
 }
