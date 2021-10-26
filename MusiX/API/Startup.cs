@@ -169,7 +169,7 @@ namespace API
                 await database.AddUserModel(new UserModel
                 {
                     CreationDate = DateTime.Now,
-                    UserName = "admin",
+                    Username = "admin",
                     Email = "fontys.musix@gmail.com"
                 });
             }

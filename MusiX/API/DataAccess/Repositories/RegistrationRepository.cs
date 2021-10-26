@@ -30,7 +30,7 @@ namespace API.DataAccess.Repositories
         {
             using ISession session = sessionFactory.OpenSession();
             using ITransaction transaction = session.BeginTransaction();
-            return await session.Query<UserModel>().Where(m => m.UserName == username).FirstOrDefaultAsync();
+            return await session.Query<UserModel>().Where(m => m.Username == username).FirstOrDefaultAsync();
         }
 
         public async Task<UserModel> GetUserModelByEmail(string email)

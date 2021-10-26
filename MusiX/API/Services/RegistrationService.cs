@@ -67,7 +67,7 @@ namespace API.Services
             if (result.Succeeded)
             {
                 await userManager.AddToRoleAsync(user, "general");
-                await registrationRepository.AddUserModel(new UserModel { CreationDate = DateTime.Now, UserName = user.UserName, Email = user.Email });
+                await registrationRepository.AddUserModel(new UserModel { CreationDate = DateTime.Now, Username = user.UserName, Email = user.Email });
                 mailService.SendUserCreatedMail(user.UserName, user.Email, password);
                 return true;
             }
