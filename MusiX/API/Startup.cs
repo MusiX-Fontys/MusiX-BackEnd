@@ -6,11 +6,15 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using Microsoft.OpenApi.Models;
 using API.DataAccess;
 using API.Services;
 using API.DataAccess.Repositories;
+using Newtonsoft.Json;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using API.Utils;
 using System.Threading.Tasks;
 using API.Models;
 
@@ -62,7 +66,31 @@ namespace API
             }).AddEntityFrameworkStores<IdentityDatabaseContext>()
                .AddDefaultTokenProviders();
 
-            services.AddControllers();
+            // JWT setup
+            services.AddAuthentication(x => {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(x => {
+                x.RequireHttpsMetadata = false;
+                x.SaveToken = true;
+                x.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(Configuration["JwtKey"])),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                };
+            });
+
+            // JWT Configuration
+            JwtConfiguration.Init(Configuration);
+
+            services.AddControllers()
+                .AddNewtonsoftJson(options =>
+                {
+                    options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                });
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
@@ -70,6 +98,7 @@ namespace API
 
             //Services
             services.AddTransient<RegistrationService>();
+            services.AddTransient<AuthenticationService>();
 
             services.AddTransient<MailService>();
 
@@ -140,7 +169,7 @@ namespace API
                 await database.AddUserModel(new UserModel
                 {
                     CreationDate = DateTime.Now,
-                    UserName = "admin",
+                    Username = "admin",
                     Email = "fontys.musix@gmail.com"
                 });
             }

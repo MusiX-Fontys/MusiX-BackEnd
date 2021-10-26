@@ -10,7 +10,7 @@ namespace API.DataAccess
             Table("user");
             Id(i => i.Id);
             Map(i => i.CreationDate);
-            Map(i => i.UserName);
+            Map(i => i.Username);
             Map(i => i.Email);
         }
     }
