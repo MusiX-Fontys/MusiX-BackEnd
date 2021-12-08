@@ -17,6 +17,8 @@ using System.Text;
 using API.Utils;
 using System.Threading.Tasks;
 using API.Models;
+using API.Attributes;
+using AutoMapper;
 
 namespace API
 {
@@ -34,11 +36,10 @@ namespace API
         public void ConfigureServices(IServiceCollection services)
         {
             // Connection strings for the Identity database
-#if DEBUG
-            IdentityDatabaseConnectionString = Configuration.GetConnectionString("LocalIdentityDatabaseConnection");
-#else
-            IdentityDatabaseConnectionString = Configuration.GetConnectionString("LiveIdentityDatabaseConnection");
-#endif
+            if(Configuration["ReleaseType"] == "debug")
+                IdentityDatabaseConnectionString = Configuration.GetConnectionString("LocalIdentityDatabaseConnection");
+            else
+                IdentityDatabaseConnectionString = Configuration.GetConnectionString("LiveIdentityDatabaseConnection");
 
             // Allow cors
             services.AddCors(options =>
@@ -50,7 +51,7 @@ namespace API
             });
 
             // Database connection for identity
-            services.AddDbContext<IdentityDatabaseContext>(options => options.UseMySql(IdentityDatabaseConnectionString, 
+            services.AddDbContext<IdentityDatabaseContext>(options => options.UseMySql(IdentityDatabaseConnectionString,
                 ServerVersion.AutoDetect(IdentityDatabaseConnectionString)));
 
             // Default identity user
@@ -85,6 +86,15 @@ namespace API
             // JWT Configuration
             JwtConfiguration.Init(Configuration);
 
+            // Add policies
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("HasSpotifyToken", policy =>
+                {
+                    policy.Requirements.Add(new HasSpotifyToken());
+                });
+            });
+
             services.AddControllers()
                 .AddNewtonsoftJson(options =>
                 {
@@ -96,14 +106,20 @@ namespace API
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
             });
 
-            //Services
+            services.AddAutoMapper(typeof(Startup));
+
+            // Services
+            services.AddTransient<UserService>();
             services.AddTransient<RegistrationService>();
             services.AddTransient<AuthenticationService>();
-
+            services.AddTransient<SpotifyService>();
+            services.AddTransient<ProfileService>();
+            services.AddTransient<ScrobbleService>();
             services.AddTransient<MailService>();
 
-            //Repositories
-            services.AddTransient<RegistrationRepository>();
+            // Repositories
+            services.AddTransient<UserRepository>();
+            services.AddTransient<ScrobbleRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -138,15 +154,16 @@ namespace API
         {
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
             var userManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
-            var database = serviceProvider.GetRequiredService<RegistrationRepository>();
+            var userService = serviceProvider.GetRequiredService<UserService>();
+            var mapper = serviceProvider.GetRequiredService<IMapper>();
 
             // Add general role
             if (!await roleManager.RoleExistsAsync("general"))
-                await roleManager.CreateAsync(new IdentityRole("general"));
+                roleManager.CreateAsync(new IdentityRole("general"));
 
             // Add administrator role
             if (!await roleManager.RoleExistsAsync("administrator"))
-                await roleManager.CreateAsync(new IdentityRole("administrator"));
+                roleManager.CreateAsync(new IdentityRole("administrator"));
 
             // Create admin identity user
             if (await userManager.FindByNameAsync("admin") == null)
@@ -164,14 +181,11 @@ namespace API
             }
 
             // Create admin musix user
-            if (await database.GetUserModelByUsername("admin") == null)
+            if (await userService.GetUserModelByUsername("admin") == null)
             {
-                await database.AddUserModel(new UserModel
-                {
-                    CreationDate = DateTime.Now,
-                    Username = "admin",
-                    Email = "fontys.musix@gmail.com"
-                });
+                var user = await userManager.FindByNameAsync("admin");
+
+                userService.AddUserModel(mapper.Map(user, new User()));
             }
         }
     }

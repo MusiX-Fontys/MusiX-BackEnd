@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace API.DataTransferObjects
+namespace API.DataTransferObjects.MusiX
 {
     public class ApiResponse
     {

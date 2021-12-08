@@ -3,6 +3,7 @@ using MailKit.Net.Smtp;
 using Microsoft.Extensions.Configuration;
 using MimeKit;
 using System;
+using System.Threading.Tasks;
 
 namespace API.Services
 {
@@ -34,7 +35,7 @@ namespace API.Services
             SendEmail(userCreatedMail);
         }
 
-        private async void SendEmail(MimeMessage email)
+        private async Task SendEmail(MimeMessage email)
         {
             try
             {

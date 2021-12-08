@@ -18,11 +18,10 @@ namespace API.Utils
         public static void Init(IConfiguration configuration)
         {
             JWTKey = configuration["JwtKey"];
-#if DEBUG
-            JWTIssuer = configuration["JwtIssuerDev"];
-#else
-            JWTIssuer = configuration["JwtIssuer"];
-#endif
+            if (configuration["ReleaseType"] == "debug")
+                JWTIssuer = configuration["JwtIssuerDev"];
+            else
+                JWTIssuer = configuration["JwtIssuer"];
         }
 
         public static string GenerateJWT(IdentityUser user, string role)
@@ -50,14 +49,9 @@ namespace API.Utils
         }
 
         private static string GenerateJTI()
-        {
-            return Guid.NewGuid().ToString();
-        }
+            => Guid.NewGuid().ToString();
 
         private static SigningCredentials CreateCredentials()
-        {
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JWTKey));
-            return new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-        }
+            => new(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JWTKey)), SecurityAlgorithms.HmacSha256);
     }
 }

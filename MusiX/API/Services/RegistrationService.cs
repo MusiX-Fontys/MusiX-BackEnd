@@ -1,19 +1,21 @@
-﻿using API.DataAccess.Repositories;
-using API.Models;
+﻿using API.Models;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Net.Mail;
+using AutoMapper;
+using System.Security.Cryptography;
 
 namespace API.Services
 {
     public class RegistrationService
     {
         private readonly UserManager<IdentityUser> userManager;
-        private readonly RegistrationRepository registrationRepository;
+        private readonly UserService userService;
         private readonly MailService mailService;
+        private readonly IMapper mapper;
 
         private readonly PasswordOptions passwordOptions = new()
         {
@@ -25,11 +27,12 @@ namespace API.Services
             RequireNonAlphanumeric = true
         };
 
-        public RegistrationService(UserManager<IdentityUser> userManager, RegistrationRepository registrationRepository, MailService mailService)
+        public RegistrationService(UserManager<IdentityUser> userManager, UserService userService, MailService mailService, IMapper mapper)
         {
             this.userManager = userManager;
-            this.registrationRepository = registrationRepository;
+            this.userService = userService;
             this.mailService = mailService;
+            this.mapper = mapper;
         }
 
         public bool IsEmailValid(string email)
@@ -67,7 +70,7 @@ namespace API.Services
             if (result.Succeeded)
             {
                 await userManager.AddToRoleAsync(user, "general");
-                await registrationRepository.AddUserModel(new UserModel { CreationDate = DateTime.Now, Username = user.UserName, Email = user.Email });
+                await userService.AddUserModel(mapper.Map(user, new User()));
                 mailService.SendUserCreatedMail(user.UserName, user.Email, password);
                 return true;
             }
@@ -82,7 +85,7 @@ namespace API.Services
             "abcdefghijkmnopqrstuvwxyz",    // lowercase
             "0123456789",                   // digits
             "!@$?_-"                        // non-alphanumeric
-        };
+            };
 
             var rand = new Random(Environment.TickCount);
             List<char> chars = new();

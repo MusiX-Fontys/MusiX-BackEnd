@@ -6,41 +6,56 @@ using NHibernate;
 using NHibernate.Linq;
 using NHibernate.Tool.hbm2ddl;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace API.DataAccess.Repositories
 {
-    public class RegistrationRepository
+    public class UserRepository
     {
         private readonly string connectionString;
         private readonly ISessionFactory sessionFactory;
 
-        public RegistrationRepository(IConfiguration configuration)
+        public UserRepository(IConfiguration configuration)
         {
-#if DEBUG
-            connectionString = configuration.GetConnectionString("LocalDatabaseConnection");
-#else
-            connectionString = configuration.GetConnectionString("LiveDatabaseConnection");
-#endif
+            if (configuration["ReleaseType"] == "debug")
+                connectionString = configuration.GetConnectionString("LocalDatabaseConnection");
+            else
+                connectionString = configuration.GetConnectionString("LiveDatabaseConnection");
+
             sessionFactory = GetSessionFactory();
         }
 
-        public async Task<UserModel> GetUserModelByUsername(string username)
+        public async Task<List<User>> GetUserModelsBySearch(string search)
         {
             using ISession session = sessionFactory.OpenSession();
             using ITransaction transaction = session.BeginTransaction();
-            return await session.Query<UserModel>().Where(m => m.Username == username).FirstOrDefaultAsync();
+            return await session.Query<User>().Where(m => m.Name.IndexOf(search, StringComparison.OrdinalIgnoreCase) != -1).ToListAsync();
         }
 
-        public async Task<UserModel> GetUserModelByEmail(string email)
+        public async Task<User> GetUserModelById(string id)
         {
             using ISession session = sessionFactory.OpenSession();
             using ITransaction transaction = session.BeginTransaction();
-            return await session.Query<UserModel>().Where(m => m.Email == email).FirstOrDefaultAsync();
+            return await session.Query<User>().Where(m => m.Id == id).FirstOrDefaultAsync();
         }
 
-        public async Task AddUserModel(UserModel user)
+        public async Task<User> GetUserModelByUsername(string username)
+        {
+            using ISession session = sessionFactory.OpenSession();
+            using ITransaction transaction = session.BeginTransaction();
+            return await session.Query<User>().Where(m => m.Name == username).FirstOrDefaultAsync();
+        }
+
+        public async Task<User> GetUserModelByEmail(string email)
+        {
+            using ISession session = sessionFactory.OpenSession();
+            using ITransaction transaction = session.BeginTransaction();
+            return await session.Query<User>().Where(m => m.Email == email).FirstOrDefaultAsync();
+        }
+
+        public async Task AddUserModel(User user)
         {
             using ISession session = sessionFactory.OpenSession();
             using ITransaction transaction = session.BeginTransaction();
@@ -48,7 +63,7 @@ namespace API.DataAccess.Repositories
             await transaction.CommitAsync();
         }
 
-        public async Task UpdateUserModel(UserModel user)
+        public async Task UpdateUserModel(User user)
         {
             using ISession session = sessionFactory.OpenSession();
             using ITransaction transaction = session.BeginTransaction();
@@ -56,7 +71,7 @@ namespace API.DataAccess.Repositories
             await transaction.CommitAsync();
         }
 
-        public async Task DeleteUserModel(UserModel user)
+        public async Task DeleteUserModel(User user)
         {
             using ISession session = sessionFactory.OpenSession();
             using ITransaction transaction = session.BeginTransaction();
@@ -76,7 +91,7 @@ namespace API.DataAccess.Repositories
                        .BuildConfiguration()
                        .BuildSessionFactory();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Console.WriteLine(e.Message);
                 return null;

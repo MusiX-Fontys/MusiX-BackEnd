@@ -1,4 +1,4 @@
-﻿using API.DataTransferObjects;
+﻿using API.DataTransferObjects.MusiX;
 using API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
