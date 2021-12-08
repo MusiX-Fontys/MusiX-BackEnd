@@ -43,7 +43,7 @@ jobs:
       if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
       shell: powershell
       run: |
-        new-item -path .\MusiX\.sonar\scanner -itemtype directory
+        New-Item -type directory .\MusiX\.sonar\scanner -Force
         dotnet tool update dotnet-sonarscanner --tool-path .\MusiX\.sonar\scanner
     
     - name: Build and analyze
