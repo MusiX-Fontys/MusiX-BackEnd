@@ -44,7 +44,7 @@ jobs:
       shell: powershell
       run: |
         New-Item -Path ./MusiX\.sonar\scanner -ItemType Directory
-        dotnet tool update dotnet-sonarscanner --tool-path ./MusiX\.sonar\scanner
+        dotnet tool install --global dotnet-sonarscanner
 
     - name: Build and analyze
       env:
@@ -52,6 +52,6 @@ jobs:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       shell: powershell
       run: |
-        ./MusiX\.sonar\scanner\dotnet-sonarscanner begin /k:"MusiX-Fontys_MusiX-BackEnd" /o:"musix-fontys" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="${{ secrets.SONAR_HOST_URL }}"
+        dotnet sonarscanner begin /k:"MusiX-Fontys_MusiX-BackEnd" /o:"musix-fontys" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="${{ secrets.SONAR_HOST_URL }}"
         dotnet build ./MusiX
-        ./MusiX\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
+        dotnet sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
