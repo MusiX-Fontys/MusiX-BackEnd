@@ -24,33 +24,34 @@ jobs:
       with:
         fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
         
-    - name: Cache SonarQube packages
+    - name: Cache SonarCloud packages
       uses: actions/cache@v1
       with:
-        path: ~/sonar/cache
+        path: ~\sonar\cache
         key: ${{ runner.os }}-sonar
         restore-keys: ${{ runner.os }}-sonar
-        
-    - name: Cache SonarQube scanner
+
+    - name: Cache SonarCloud scanner
       id: cache-sonar-scanner
       uses: actions/cache@v1
       with:
-        path: MusiX/.sonar/scanner
+        path: .\.sonar\scanner
         key: ${{ runner.os }}-sonar-scanner
         restore-keys: ${{ runner.os }}-sonar-scanner
-        
-    - name: Install SonarQube scanner
+
+    - name: Install SonarCloud scanner
       if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
       shell: powershell
       run: |
-        New-Item -type directory MusiX/.sonar/scanner -Force
-        dotnet tool update dotnet-sonarscanner --tool-path MusiX/.sonar/scanner
-    
+        New-Item -Path .\.sonar\scanner -ItemType Directory
+        dotnet tool update dotnet-sonarscanner --tool-path .\.sonar\scanner
+
     - name: Build and analyze
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       shell: powershell
       run: |
-        ./MusiX/.sonar/scanner/dotnet-sonarscanner begin /k:"MusiX" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="${{ secrets.SONAR_HOST_URL }}"
+        .\.sonar\scanner\dotnet-sonarscanner begin /k:"MusiX-Fontys_MusiX-BackEnd" /o:"musix-fontys" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="${{ secrets.SONAR_HOST_URL }}"
         dotnet build ./MusiX
-        ./MusiX/.sonar/scanner/dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
+        .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
