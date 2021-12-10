@@ -50,12 +50,14 @@ jobs:
       run: |
         New-Item -Path ./MusiX\.sonar\scanner -ItemType Directory
         dotnet tool update --global dotnet-sonarscanner
+        
     - name: Build and analyze
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       shell: powershell
       run: |
+        dotnet tool install --global dotnet-sonarscanner
         dotnet sonarscanner begin /k:"MusiX-Fontys_MusiX-BackEnd" /o:"musix-fontys" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="${{ secrets.SONAR_HOST_URL }}"
         dotnet build ./MusiX
         dotnet sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
