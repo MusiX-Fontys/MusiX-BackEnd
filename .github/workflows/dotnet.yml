@@ -63,14 +63,18 @@ jobs:
     runs-on: windows-latest
     needs: [build]
     
+    defaults:
+      run:
+        working-directory: ./MusiX/API
+    
     steps:
-    - name: Get Current Branch
-      id: get_branch
-      shell: bash
-      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+    #- name: Get Current Branch
+    #  id: get_branch
+    #  shell: bash
+    #  run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
       
     - name: Build Docker-Compose
-      run: docker-compose up --build ./MusiX/API
+      run: docker-compose up --build
       
     #- name: Login in to DockerHub
     #  if: steps.get_branch.outputs.branch == 'main'
