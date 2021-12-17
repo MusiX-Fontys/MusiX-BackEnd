@@ -19,11 +19,7 @@ namespace API.DataAccess.Repositories
 
         public UserRepository(IConfiguration configuration)
         {
-            if (configuration["ReleaseType"] == "debug")
-                connectionString = configuration.GetConnectionString("LocalDatabaseConnection");
-            else
-                connectionString = configuration.GetConnectionString("LiveDatabaseConnection");
-
+            connectionString = configuration.GetConnectionString("MusiXDatabaseConnection");
             sessionFactory = GetSessionFactory();
         }
 

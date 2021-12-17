@@ -19,11 +19,7 @@ namespace API.DataAccess.Repositories
 
         public ScrobbleRepository(IConfiguration configuration)
         {
-            if (configuration["ReleaseType"] == "debug")
-                connectionString = configuration.GetConnectionString("LocalDatabaseConnection");
-            else
-                connectionString = configuration.GetConnectionString("LiveDatabaseConnection");
-
+            connectionString = configuration.GetConnectionString("MusiXDatabaseConnection");
             sessionFactory = GetSessionFactory();
         }
 
@@ -70,7 +66,8 @@ namespace API.DataAccess.Repositories
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
+                Console.WriteLine("Exception: " + e.Message);
+                Sentry.SentrySdk.CaptureException(e);
                 return null;
             }
         }

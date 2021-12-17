@@ -527,3 +527,4 @@ obj/
 # End of https://www.toptal.com/developers/gitignore/api/aspnetcore,csharp,dotnetcore
 MusiX/.editorconfig
 MusiX/.sonarqube
+MusiX/API/musix_db

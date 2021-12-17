@@ -36,10 +36,7 @@ namespace API
         public void ConfigureServices(IServiceCollection services)
         {
             // Connection strings for the Identity database
-            if(Configuration["ReleaseType"] == "debug")
-                IdentityDatabaseConnectionString = Configuration.GetConnectionString("LocalIdentityDatabaseConnection");
-            else
-                IdentityDatabaseConnectionString = Configuration.GetConnectionString("LiveIdentityDatabaseConnection");
+            IdentityDatabaseConnectionString = Configuration.GetConnectionString("IdentityDatabaseConnection");
 
             // Allow cors
             services.AddCors(options =>
@@ -138,6 +135,8 @@ namespace API
 
             app.UseRouting();
 
+            app.UseSentryTracing();
+
             app.UseAuthentication();
 
             app.UseAuthorization();
@@ -147,7 +146,9 @@ namespace API
                 endpoints.MapControllers();
             });
 
+#if DEBUG
             Init(serviceProvider).Wait();
+#endif
         }
 
         private static async Task Init(IServiceProvider serviceProvider)

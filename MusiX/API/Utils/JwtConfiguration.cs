@@ -18,10 +18,7 @@ namespace API.Utils
         public static void Init(IConfiguration configuration)
         {
             JWTKey = configuration["JwtKey"];
-            if (configuration["ReleaseType"] == "debug")
-                JWTIssuer = configuration["JwtIssuerDev"];
-            else
-                JWTIssuer = configuration["JwtIssuer"];
+            JWTIssuer = configuration["JwtIssuer"];
         }
 
         public static string GenerateJWT(IdentityUser user, string role)

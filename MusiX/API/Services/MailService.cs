@@ -48,6 +48,7 @@ namespace API.Services
             }
             catch (Exception e)
             {
+                Sentry.SentrySdk.CaptureException(e);
                 Console.WriteLine(e.Message);
             }
         }

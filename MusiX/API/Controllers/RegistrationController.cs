@@ -12,11 +12,11 @@ namespace API.Controllers
     [AllowAnonymous]
     public class RegistrationController : ControllerBase
     {
-        private readonly RegistrationService signUpService;
+        private readonly RegistrationService registrationService;
 
-        public RegistrationController(RegistrationService signUpService)
+        public RegistrationController(RegistrationService registrationService)
         {
-            this.signUpService = signUpService;
+            this.registrationService = registrationService;
         }
 
         [HttpPost]
@@ -30,18 +30,19 @@ namespace API.Controllers
                     UserName = model.UserName.Trim()
                 };
 
-                if (!signUpService.IsEmailValid(user.Email))
+                if (!registrationService.IsEmailValid(user.Email))
                     return BadRequest(ApiResponse.Error("Not valid email submitted."));
 
-                if (await signUpService.DoesEmailExist(user.Email))
+                if (await registrationService.DoesEmailExist(user.Email))
                     return BadRequest(ApiResponse.Error("There already exists an account with this email."));
 
-                if (await signUpService.DoesUsernameExist(user.UserName))
+                if (await registrationService.DoesUsernameExist(user.UserName))
                     return BadRequest(ApiResponse.Error("There already exists an account with this username."));
 
-                if(await signUpService.CreateIdentityAccount(user))
+                if(await registrationService.CreateIdentityAccount(user))
                     return Ok(ApiResponse.Ok($"User succesfully created. An email will be sent to you with your password."));
 
+                Sentry.SentrySdk.CaptureMessage("Failed to create Identity user.");
                 return BadRequest(ApiResponse.Error("Failed to create Identity user. Please try again later."));
             }
 
