@@ -74,6 +74,7 @@ jobs:
     #  run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
       
     - name: Build Docker-Compose
+      shell: powershell
       run: docker-compose up --build
       
     #- name: Login in to DockerHub
