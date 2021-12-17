@@ -63,11 +63,16 @@ jobs:
     runs-on: windows-latest
     needs: [build]
     
-    defaults:
-      run:
-        working-directory: ./MusiX/API
-    
     steps:
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+        
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+        
     #- name: Get Current Branch
     #  id: get_branch
     #  shell: bash
@@ -75,7 +80,9 @@ jobs:
       
     - name: Build Docker-Compose
       shell: powershell
-      run: docker-compose up --build
+      run: |
+        cd ./MusiX/API
+        docker-compose up --build
       
     #- name: Login in to DockerHub
     #  if: steps.get_branch.outputs.branch == 'main'
