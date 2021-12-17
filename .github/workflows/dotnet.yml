@@ -9,8 +9,6 @@ on:
 jobs:
   build:
     runs-on: windows-latest
-    outputs:
-      build-status: ${{ steps.build_and_analyze.outputs.triggered }}
 
     steps:
     - name: Setup .NET
@@ -64,7 +62,6 @@ jobs:
   deploy:
     runs-on: windows-latest
     needs: [build]
-    if: needs.build.outputs.build-status == 'true'
     
     steps:
     - name: Get Current Branch
