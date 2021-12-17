@@ -70,7 +70,6 @@ jobs:
       run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
       
     - name: Build Docker-Compose
-      if: steps.get_branch.outputs.branch == 'main'
       run: docker-compose up --build ./MusiX/API
       
     #- name: Login in to DockerHub
