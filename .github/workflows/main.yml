@@ -118,7 +118,7 @@ jobs:
     - name: Docker Build & Push Action
       uses: mr-smithers-excellent/docker-build-push@v5.6
       with:
-        image: ruben/musix-api
+        image: ${{ secrets.DOCKERHUB_USERNAME }}/musix-api
         tags: stable
         registry: docker.io
         dockerfile: MusiX/API/Dockerfile
