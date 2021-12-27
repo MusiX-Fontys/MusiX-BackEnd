@@ -112,5 +112,16 @@ jobs:
     #    docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/musix:latest
     #    docker push ${{ secrets.DOCKERHUB_USERNAME }}/musix:latest
         
-    - name: Execute Docker Compose
-      run: docker-compose up --build
+    #- name: Execute Docker Compose
+    #  run: docker-compose up --build
+      
+    - name: Docker Build & Push Action
+      uses: mr-smithers-excellent/docker-build-push@v5.6
+      with:
+        image: ruben/musix-api
+        tags: stable
+        registry: docker.io
+        dockerfile: MusiX/API/Dockerfile
+        directory: MusiX/API
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
