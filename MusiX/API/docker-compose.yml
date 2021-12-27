@@ -3,7 +3,7 @@
 services:
   api:
     container_name: musix_api
-    image: mcr.microsoft.com/dotnet/aspnet:5.0
+    image: rubenotter/musix-api:stable
     build:
       context: ./
     depends_on:
@@ -15,7 +15,6 @@ services:
     container_name: musix_db
     image: mysql:latest
     restart: always
-    #command: --default-authentiation-plugin=mysql_native-password
     build:
       context: ./Database
     environment:
