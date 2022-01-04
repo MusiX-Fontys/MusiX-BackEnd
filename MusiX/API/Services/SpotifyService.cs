@@ -15,12 +15,14 @@ namespace API.Services
     {
         private static readonly string BASE_ADDRESS = "https://api.spotify.com/v1/";
 
-        private readonly ScrobbleRepository spotifyRepository;
+        private readonly ScrobbleRepository scrobbleRepository;
+        private readonly ArtistRepository artistRepository;
         private readonly IMapper mapper;
 
-        public SpotifyService(ScrobbleRepository spotifyRepository, IMapper mapper)
+        public SpotifyService(ScrobbleRepository scrobbleRepository, ArtistRepository artistRepository, IMapper mapper)
         {
-            this.spotifyRepository = spotifyRepository;
+            this.scrobbleRepository = scrobbleRepository;
+            this.artistRepository = artistRepository;
             this.mapper = mapper;
         }
 
@@ -37,17 +39,16 @@ namespace API.Services
             foreach(var scrobble in result.Scrobbles.OrderByDescending(i => i.PlayedAt))
             {
                 var scrobbleModel = mapper.Map(scrobble, new Scrobble() { UserId = user.Id });
-
                 if (scrobbleModel.PlayedAt <= afterTimeStamp)
                     return;
-
-                spotifyRepository.AddScrobble(scrobbleModel);
+                scrobbleRepository.AddScrobble(scrobbleModel);
+                GetArtistImages(accessToken);
             }
         }
 
         private async Task<long> GetLastTimeStamp(User user)
         {
-            var lastScrobble = await spotifyRepository.GetLastScrobbleByUserId(user.Id);
+            var lastScrobble = await scrobbleRepository.GetLastScrobbleByUserId(user.Id);
             if (lastScrobble == null)
                 return user.SpotifyConnectionSetAt;
             return lastScrobble.PlayedAt;
@@ -58,6 +59,24 @@ namespace API.Services
             using var client = CreateClient(accessToken);
             var response = await client.GetAsync($"me/player/recently-played?before={timeStamp}&limit=50");
             return JsonConvert.DeserializeObject<RecentlyPlayedResponse>(await response.Content.ReadAsStringAsync());
+        }
+
+        private async Task GetArtistImages(string accessToken)
+        {
+            var artists = await artistRepository.GetArtists();
+
+            using var client = CreateClient(accessToken);
+
+            foreach(var artist in artists.Where(i => string.IsNullOrWhiteSpace(i.Image)))
+            {
+                var response = await client.GetAsync($"artists/{artist.Id}");
+                var spotifyArtist = JsonConvert.DeserializeObject<SpotifyArtist>(await response.Content.ReadAsStringAsync());
+                if (spotifyArtist.Images.Any())
+                {
+                    artist.Image = spotifyArtist.Images[0].Url;
+                    artistRepository.UpdateArtistModel(artist);
+                }
+            }
         }
 
         private static HttpClient CreateClient(string accessToken)

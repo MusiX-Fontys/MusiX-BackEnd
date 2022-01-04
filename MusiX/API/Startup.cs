@@ -89,6 +89,7 @@ namespace API
                 options.AddPolicy("HasSpotifyToken", policy =>
                 {
                     policy.Requirements.Add(new HasSpotifyToken());
+                    policy.RequireAuthenticatedUser();
                 });
             });
 
@@ -117,6 +118,7 @@ namespace API
             // Repositories
             services.AddTransient<UserRepository>();
             services.AddTransient<ScrobbleRepository>();
+            services.AddTransient<ArtistRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -8,6 +8,7 @@ namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [AllowAnonymous]
     public class ProfileController : ControllerBase
     {
         private readonly ProfileService profileService;
@@ -17,8 +18,15 @@ namespace API.Controllers
             this.profileService = profileService;
         }
 
-        [AllowAnonymous]
-        [HttpGet("{search}")]
+        [HttpGet("{id}")]
+        public async Task<ActionResult<ApiResponse>> GetProfileById([FromRoute] string id)
+        {
+            var profile = await profileService.GetProfileById(id);
+            return Ok(ApiResponse.Ok().AddData("profile", profile));
+        }
+
+
+        [HttpGet("search/{search}")]
         public async Task<ActionResult<ApiResponse>> GetProfilesBySearchQuery([FromRoute] string search)
         {
             if (string.IsNullOrWhiteSpace(search))

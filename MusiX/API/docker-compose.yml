@@ -24,5 +24,13 @@ services:
     volumes:
       - ./musix_db:/var/lib/mysql
 
+  phpmyadmin:
+    container_name: phpmyadmin
+    image: phpmyadmin/phpmyadmin:latest
+    depends_on:
+      - db
+    ports:
+      - "8081:80"
+
 volumes:
   musix_db:

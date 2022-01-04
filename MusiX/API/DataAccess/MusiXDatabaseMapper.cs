@@ -93,6 +93,7 @@ namespace API.DataAccess
             Id(i => i.Id);
             Map(i => i.CreationDate);
             Map(i => i.Name);
+            Map(i => i.Image);
         }
     }
 }

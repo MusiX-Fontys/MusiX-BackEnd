@@ -18,6 +18,9 @@ namespace API.Services
             this.mapper = mapper;
         }
 
+        public async Task<ProfileSearchModel> GetProfileById(string id)
+            => mapper.Map<User, ProfileSearchModel>(await userRepository.GetUserModelById(id));
+
         public async Task<List<ProfileSearchModel>> GetProfilesBySearchQuery(string search)
             => mapper.Map<List<User>, List<ProfileSearchModel>>(await userRepository.GetUserModelsBySearch(search));
     }
