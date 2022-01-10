@@ -1,4 +1,5 @@
 ﻿using API.Models;
+using API.Utils;
 using FluentNHibernate.Cfg;
 using FluentNHibernate.Cfg.Db;
 using Microsoft.Extensions.Configuration;
@@ -14,13 +15,11 @@ namespace API.DataAccess.Repositories
 {
     public class CommentRepository
     {
-        private readonly string connectionString;
         private readonly ISessionFactory sessionFactory;
 
         public CommentRepository(IConfiguration configuration)
         {
-            connectionString = configuration.GetConnectionString("MusiXDatabaseConnection");
-            sessionFactory = GetSessionFactory();
+            sessionFactory = DatabaseUtil.GetSessionFactory(configuration.GetConnectionString("MusiXDatabaseConnection"));
         }
 
         public async Task<List<ProfileComment>> GetProfileComments(string id)
@@ -36,25 +35,6 @@ namespace API.DataAccess.Repositories
             using ITransaction transaction = session.BeginTransaction();
             await session.SaveAsync(comment);
             await transaction.CommitAsync();
-        }
-
-        private ISessionFactory GetSessionFactory()
-        {
-            try
-            {
-                return Fluently
-                       .Configure()
-                       .Database(MySQLConfiguration.Standard.ConnectionString(connectionString))
-                       .Mappings(m => m.FluentMappings.AddFromAssemblyOf<DatabaseModel>())
-                       .ExposeConfiguration(config => new SchemaUpdate(config).Execute(true, true))
-                       .BuildConfiguration()
-                       .BuildSessionFactory();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-                return null;
-            }
         }
     }
 }
