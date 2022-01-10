@@ -3,7 +3,14 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31410.357
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API", "API\API.csproj", "{8131892A-06AB-4BEC-918C-0D1AFF04B120}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "API", "API\API.csproj", "{8131892A-06AB-4BEC-918C-0D1AFF04B120}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F947C97D-DB74-485E-92DD-3F7D998701DF}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusiXTests", "MusiXTests\MusiXTests.csproj", "{5DA7BA5B-FF53-4573-AB57-E580476432FF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +22,10 @@ Global
 		{8131892A-06AB-4BEC-918C-0D1AFF04B120}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8131892A-06AB-4BEC-918C-0D1AFF04B120}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8131892A-06AB-4BEC-918C-0D1AFF04B120}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5DA7BA5B-FF53-4573-AB57-E580476432FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5DA7BA5B-FF53-4573-AB57-E580476432FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5DA7BA5B-FF53-4573-AB57-E580476432FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5DA7BA5B-FF53-4573-AB57-E580476432FF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

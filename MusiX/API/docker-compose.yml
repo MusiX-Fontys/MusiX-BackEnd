@@ -1,0 +1,36 @@
+﻿version: "3.9"
+
+services:
+  api:
+    container_name: musix_api
+    image: rubenotter/musix-api:stable
+    build:
+      context: ./
+    depends_on:
+      - db
+    ports:
+      - "8080:80"
+
+  db:
+    container_name: musix_db
+    image: mysql:latest
+    restart: always
+    build:
+      context: ./Database
+    environment:
+      MYSQL_ROOT_PASSWORD: test
+    ports:
+      - "3306:3306" 
+    volumes:
+      - ./musix_db:/var/lib/mysql
+
+  phpmyadmin:
+    container_name: phpmyadmin
+    image: phpmyadmin/phpmyadmin:latest
+    depends_on:
+      - db
+    ports:
+      - "8081:80"
+
+volumes:
+  musix_db:
