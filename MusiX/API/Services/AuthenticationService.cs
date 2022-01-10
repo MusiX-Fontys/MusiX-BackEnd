@@ -42,5 +42,20 @@ namespace API.Services
 
             return null;
         }
+
+        public async Task<string> AuthenticateAdmin(LoginModel model)
+        {
+            var user = await userManager.FindByEmailAsync(model.Email);
+            var roles = await userManager.GetRolesAsync(user);
+            if (!roles.Contains("administrator"))
+                return null;
+
+            var result = await signInManager.PasswordSignInAsync(user, model.Password, false, false);
+
+            if (result.Succeeded)
+                return JwtConfiguration.GenerateJWT(user, roles[0]);
+
+            return null;
+        }
     }
 }

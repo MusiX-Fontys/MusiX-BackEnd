@@ -43,10 +43,18 @@ namespace API.DataAccess
                 .ForMember(dest => dest.PlayedAt, opt => opt.MapFrom(src => ((DateTimeOffset)src.PlayedAt).ToUnixTimeMilliseconds()))
                 .ForAllOtherMembers(opt => opt.Ignore());
 
-            CreateMap<User, ProfileSearchModel>()
+            CreateMap<User, UserProfileModel>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.Username, opt => opt.MapFrom(src => src.Name))
                 .ForMember(dest => dest.JoinDate, opt => opt.MapFrom(src => src.CreationDate))
+                .ForMember(dest => dest.Following, opt => opt.MapFrom(src => src.Following.Select(user => user.Id)))
+                .ForMember(dest => dest.Followers, opt => opt.MapFrom(src => src.Followers.Select(user => user.Id)))
+                .ForMember(dest => dest.Comments, opt => opt.MapFrom(src => src.ProfileComments.Select(comment => new ProfileCommentModel() {
+                        Id = comment.CommentUser.Id,
+                        Name = comment.CommentUser.Name,
+                        Comment = comment.Comment
+                    }).ToList()
+                ))
                 .ForAllOtherMembers(opt => opt.Ignore());
         }
     }

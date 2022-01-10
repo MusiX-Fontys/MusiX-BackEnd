@@ -6,7 +6,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Net.Mail;
 using AutoMapper;
-using System.Security.Cryptography;
 
 namespace API.Services
 {
@@ -65,6 +64,10 @@ namespace API.Services
         public async Task<bool> CreateIdentityAccount(IdentityUser user)
         {
             var password = GenerateRandomPassword();
+            user.SecurityStamp = Guid.NewGuid().ToString();
+            if (user.SecurityStamp == null)
+                return false;
+
             var result = await userManager.CreateAsync(user, password);
 
             if (result.Succeeded)

@@ -1,4 +1,5 @@
-﻿using API.Utils;
+﻿using API.Models;
+using API.Utils;
 using MailKit.Net.Smtp;
 using Microsoft.Extensions.Configuration;
 using MimeKit;
@@ -35,6 +36,96 @@ namespace API.Services
             SendEmail(userCreatedMail);
         }
 
+        public void SendUserFollowingMail(User user, string username)
+        {
+            var userFollowingMail = new MimeMessage();
+
+            userFollowingMail.From.Add(musixMail);
+            userFollowingMail.To.Add(new MailboxAddress(user.Name, user.Email));
+            userFollowingMail.Subject = "You have a new follower!";
+
+            var builder = new BodyBuilder
+            {
+                HtmlBody = MailGenerator.GenerateUserFollowingMail(username)
+            };
+
+            userFollowingMail.Body = builder.ToMessageBody();
+
+            SendEmail(userFollowingMail);
+        }
+
+        public void SendPromotionMail(User user, string role)
+        {
+            var promotionMail = new MimeMessage();
+
+            promotionMail.From.Add(musixMail);
+            promotionMail.To.Add(new MailboxAddress(user.Name, user.Email));
+            promotionMail.Subject = "You have been promoted!";
+
+            var builder = new BodyBuilder
+            {
+                HtmlBody = MailGenerator.GeneratePromotedMail(role)
+            };
+
+            promotionMail.Body = builder.ToMessageBody();
+
+            SendEmail(promotionMail);
+        }
+
+        public void SendDemotionMail(User user, string role)
+        {
+            var demotionMail = new MimeMessage();
+
+            demotionMail.From.Add(musixMail);
+            demotionMail.To.Add(new MailboxAddress(user.Name, user.Email));
+            demotionMail.Subject = "You have been demoted!";
+
+            var builder = new BodyBuilder
+            {
+                HtmlBody = MailGenerator.GenerateDemotedMail(role)
+            };
+
+            demotionMail.Body = builder.ToMessageBody();
+
+            SendEmail(demotionMail);
+        }
+
+        public void SendCommentMail(User user, string username)
+        {
+            var commentMail = new MimeMessage();
+
+            commentMail.From.Add(musixMail);
+            commentMail.To.Add(new MailboxAddress(user.Name, user.Email));
+            commentMail.Subject = "A new comment has been posted on your profile!";
+
+            var builder = new BodyBuilder
+            {
+                HtmlBody = MailGenerator.GenerateCommentMail(username)
+            };
+
+            commentMail.Body = builder.ToMessageBody();
+
+            SendEmail(commentMail);
+        }
+
+        public void SendFollowersCommentMail(User user, string commentUser, string profileUser)
+        {
+            var commentMail = new MimeMessage();
+
+            commentMail.From.Add(musixMail);
+            commentMail.To.Add(new MailboxAddress(user.Name, user.Email));
+            commentMail.Subject = $"{commentUser} has posted a new comment!";
+
+            var builder = new BodyBuilder
+            {
+                HtmlBody = MailGenerator.GenerateFollowersCommentMail(commentUser, profileUser)
+            };
+
+            commentMail.Body = builder.ToMessageBody();
+
+            SendEmail(commentMail);
+        }
+
         private async Task SendEmail(MimeMessage email)
         {
             try
@@ -49,7 +140,6 @@ namespace API.Services
             catch (Exception e)
             {
                 Sentry.SentrySdk.CaptureException(e);
-                Console.WriteLine(e.Message);
             }
         }
     }

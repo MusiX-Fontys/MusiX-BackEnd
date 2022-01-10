@@ -7,33 +7,34 @@ using NHibernate.Linq;
 using NHibernate.Tool.hbm2ddl;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace API.DataAccess.Repositories
 {
-    public class ArtistRepository
+    public class CommentRepository
     {
         private readonly string connectionString;
         private readonly ISessionFactory sessionFactory;
 
-        public ArtistRepository(IConfiguration configuration)
+        public CommentRepository(IConfiguration configuration)
         {
             connectionString = configuration.GetConnectionString("MusiXDatabaseConnection");
             sessionFactory = GetSessionFactory();
         }
 
-        public async Task<List<Artist>> GetArtists()
+        public async Task<List<ProfileComment>> GetProfileComments(string id)
         {
             using ISession session = sessionFactory.OpenSession();
             using ITransaction transaction = session.BeginTransaction();
-            return await session.Query<Artist>().ToListAsync();
+            return await session.Query<ProfileComment>().Where(comment => comment.ProfileUserId == id).ToListAsync();
         }
 
-        public async Task UpdateArtistModel(Artist artist)
+        public async Task AddComment(ProfileComment comment)
         {
             using ISession session = sessionFactory.OpenSession();
             using ITransaction transaction = session.BeginTransaction();
-            await session.UpdateAsync(artist);
+            await session.SaveAsync(comment);
             await transaction.CommitAsync();
         }
 

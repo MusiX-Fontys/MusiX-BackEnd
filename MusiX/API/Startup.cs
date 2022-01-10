@@ -113,12 +113,15 @@ namespace API
             services.AddTransient<SpotifyService>();
             services.AddTransient<ProfileService>();
             services.AddTransient<ScrobbleService>();
+            services.AddTransient<DashboardService>();
+            services.AddTransient<CommentService>();
             services.AddTransient<MailService>();
 
             // Repositories
             services.AddTransient<UserRepository>();
             services.AddTransient<ScrobbleRepository>();
             services.AddTransient<ArtistRepository>();
+            services.AddTransient<CommentRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

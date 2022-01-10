@@ -3,6 +3,7 @@ using API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Threading.Tasks;
 
 namespace API.Controllers
@@ -20,14 +21,15 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<ApiResponse>> Registrate([FromBody] RegisterModel model)
+        public async Task<IActionResult> Registrate([FromBody] RegisterModel model)
         {
             if (ModelState.IsValid)
             {
                 var user = new IdentityUser
                 {
                     Email = model.Email.Trim(),
-                    UserName = model.UserName.Trim()
+                    UserName = model.UserName.Trim(),
+                    SecurityStamp = Guid.NewGuid().ToString()
                 };
 
                 if (!registrationService.IsEmailValid(user.Email))

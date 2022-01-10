@@ -18,6 +18,25 @@ namespace API.DataAccess
             HasMany<Scrobble>(i => i.Scrobbles)
                 .Inverse()
                 .KeyColumns.Add("UserId", mapping => mapping.Name("UserId"));
+
+            HasManyToMany<User>(i => i.Following)
+                .Cascade.Merge()
+                .Not.LazyLoad()
+                .Table("Follow")
+                .ParentKeyColumn("FollowingUserId")
+                .ChildKeyColumn("FollowedUserId");
+
+            HasManyToMany<User>(i => i.Followers)
+                .Cascade.Merge()
+                .Not.LazyLoad()
+                .Inverse()
+                .Table("Follow")
+                .ParentKeyColumn("FollowedUserId")
+                .ChildKeyColumn("FollowingUserId");
+
+            HasMany<ProfileComment>(i => i.ProfileComments)
+                .Inverse()
+                .KeyColumns.Add("ProfileUserId", mapping => mapping.Name("ProfileUserId"));
         }
     }
 
@@ -94,6 +113,33 @@ namespace API.DataAccess
             Map(i => i.CreationDate);
             Map(i => i.Name);
             Map(i => i.Image);
+        }
+    }
+
+    public class ProfileCommentModelMapper : ClassMap<ProfileComment>
+    {
+        public ProfileCommentModelMapper()
+        {
+            Table("comment");
+            Id(i => i.Id);
+            Map(i => i.CreationDate);
+            Map(i => i.Comment);
+            Map(i => i.ProfileUserId);
+            Map(i => i.CommentUserId);
+
+            References(i => i.ProfileUser)
+                .Cascade.SaveUpdate()
+                .Not.LazyLoad()
+                .Class<User>()
+                .Columns("ProfileUserId")
+                .ReadOnly();
+
+            References(i => i.CommentUser)
+                .Cascade.SaveUpdate()
+                .Not.LazyLoad()
+                .Class<User>()
+                .Columns("CommentUserId")
+                .ReadOnly();
         }
     }
 }

@@ -23,6 +23,13 @@ namespace API.DataAccess.Repositories
             sessionFactory = GetSessionFactory();
         }
 
+        public async Task<List<User>> GetUserModels()
+        {
+            using ISession session = sessionFactory.OpenSession();
+            using ITransaction transaction = session.BeginTransaction();
+            return await session.Query<User>().ToListAsync();
+        }
+
         public async Task<List<User>> GetUserModelsBySearch(string search)
         {
             using ISession session = sessionFactory.OpenSession();

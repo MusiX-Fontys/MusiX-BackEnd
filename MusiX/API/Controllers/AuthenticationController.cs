@@ -19,7 +19,7 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<ApiResponse>> Authenticate([FromBody] LoginModel model)
+        public async Task<IActionResult> Authenticate([FromBody] LoginModel model)
         {
             if (ModelState.IsValid)
             {
@@ -30,6 +30,28 @@ namespace API.Controllers
                     return BadRequest(ApiResponse.Error("The email and password do not align."));
 
                 var token = await authenticationService.Authenticate(model);
+
+                if (token == null)
+                    return BadRequest(ApiResponse.Error("Failed to login."));
+
+                return Ok(ApiResponse.Ok().AddData("token", token));
+            }
+
+            return BadRequest(ApiResponse.Error("Not all required fields have been filled in."));
+        }
+
+        [HttpPost("admin")]
+        public async Task<ActionResult<ApiResponse>> AuthenticateAdmin([FromBody] LoginModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                if (!await authenticationService.DoesEmailExist(model.Email))
+                    return BadRequest(ApiResponse.Error("User not found."));
+
+                if (!await authenticationService.IsPasswordCorrect(model))
+                    return BadRequest(ApiResponse.Error("The email and password do not align."));
+
+                var token = await authenticationService.AuthenticateAdmin(model);
 
                 if (token == null)
                     return BadRequest(ApiResponse.Error("Failed to login."));

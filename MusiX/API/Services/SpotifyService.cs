@@ -40,10 +40,12 @@ namespace API.Services
             {
                 var scrobbleModel = mapper.Map(scrobble, new Scrobble() { UserId = user.Id });
                 if (scrobbleModel.PlayedAt <= afterTimeStamp)
-                    return;
+                    break;
+
                 scrobbleRepository.AddScrobble(scrobbleModel);
-                GetArtistImages(accessToken);
             }
+
+            GetArtistImages(accessToken);
         }
 
         private async Task<long> GetLastTimeStamp(User user)

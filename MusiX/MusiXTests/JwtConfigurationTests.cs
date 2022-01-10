@@ -1,7 +1,7 @@
-﻿using API.DataTransferObjects.MusiX;
-using API.Utils;
+﻿using API.Utils;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
+using MusiXTests.Utils;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -12,29 +12,14 @@ namespace MusiXTests
 {
     public class JwtConfigurationTests
     {
-        private string token;
-
-        private static IConfiguration CreateConfiguration()
-        {
-            var config = new Dictionary<string, string>
-            {
-                {"JwtKey", Guid.NewGuid().ToString()},
-                {"JwtIssuer", "issuer"}
-            };
-
-            return new ConfigurationBuilder()
-                .AddInMemoryCollection(config)
-                .Build();
-        }
-
         public JwtConfigurationTests()
         {
-            JwtConfiguration.Init(CreateConfiguration());
+            JwtConfiguration.Init(ConfigurationUtil.CreateConfiguration());
         }
 
 
         [Fact]
-        public void GenerateValidatedJWT()
+        public string GenerateValidatedJWT()
         {
             var user = new IdentityUser
             {
@@ -43,20 +28,23 @@ namespace MusiXTests
                 Email = "test@gmail.com"
             };
             var role = "general";
-            token = JwtConfiguration.GenerateJWT(user, role);
+
+            var token = JwtConfiguration.GenerateJWT(user, role);
+
             Assert.True(new JwtSecurityTokenHandler().CanReadToken(token));
+
+            return token;
         }
 
         [Fact]
         public void AreAllClaimsSetCorrectly()
         {
-            GenerateValidatedJWT();
+            var token = new JwtSecurityTokenHandler().ReadJwtToken(GenerateValidatedJWT());
 
-            var securityToken = new JwtSecurityTokenHandler().ReadJwtToken(token);
-            Assert.Equal("issuer", securityToken.Issuer);
-            Assert.Equal("test", securityToken.Claims.FirstOrDefault(i => i.Type == "name").Value);
-            Assert.Equal("test@gmail.com", securityToken.Claims.FirstOrDefault(i => i.Type == "email").Value);
-            Assert.Equal("general", securityToken.Claims.FirstOrDefault(i => i.Type == "role").Value);
+            Assert.Equal("issuer", token.Issuer);
+            Assert.Equal("test", token.Claims.FirstOrDefault(i => i.Type == "name").Value);
+            Assert.Equal("test@gmail.com", token.Claims.FirstOrDefault(i => i.Type == "email").Value);
+            Assert.Equal("general", token.Claims.FirstOrDefault(i => i.Type == "role").Value);
         }
     }
 }
