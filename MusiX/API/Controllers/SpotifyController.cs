@@ -21,7 +21,7 @@ namespace API.Controllers
 
         [Authorize]
         [HttpGet("spotify-connection")]
-        public async Task<ActionResult<ApiResponse>> HasUserSetUpSpotifyConnection()
+        public async Task<IActionResult> HasUserSetUpSpotifyConnection()
         {
             var user = await userService.GetUserModelByUsername(User.FindFirst("name").Value);
             return Ok(ApiResponse.Ok().AddData("connection", user.HasSetupSpotifyConnection));
@@ -29,7 +29,7 @@ namespace API.Controllers
 
         [Authorize(Policy = "HasSpotifyToken")]
         [HttpGet("recently-played")]
-        public async Task<ActionResult<ApiResponse>> GetRecentlyPlayed() 
+        public async Task<IActionResult> GetRecentlyPlayed() 
         {
             Request.Headers.TryGetValue("SpotifyToken", out var token);
             var user = await userService.GetUserModelByUsername(User.FindFirst("name").Value);

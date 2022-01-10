@@ -26,17 +26,14 @@ namespace API.Services
         public async Task<UserProfileModel> GetProfileById(string id)
         {
             var user = await userRepository.GetUserModelById(id);
-            user.ProfileComments = await commentRepository.GetProfileComments(id);
-            return mapper.Map<User, UserProfileModel>(user);
+            var profile = mapper.Map<User, UserProfileModel>(user);
+            profile.Comments = mapper.Map<List<ProfileComment>, List<ProfileCommentModel>>(await commentRepository.GetProfileComments(id));
+            return profile;
         }
 
         public async Task<List<UserProfileModel>> GetProfilesBySearchQuery(string search)
         {
             var users = await userRepository.GetUserModelsBySearch(search);
-            foreach(var user in users)
-            {
-                user.ProfileComments = await commentRepository.GetProfileComments(user.Id);
-            }
             return mapper.Map<List<User>, List<UserProfileModel>>(users);
         }
 

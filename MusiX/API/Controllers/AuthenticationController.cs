@@ -41,7 +41,7 @@ namespace API.Controllers
         }
 
         [HttpPost("admin")]
-        public async Task<ActionResult<ApiResponse>> AuthenticateAdmin([FromBody] LoginModel model)
+        public async Task<IActionResult> AuthenticateAdmin([FromBody] LoginModel model)
         {
             if (ModelState.IsValid)
             {

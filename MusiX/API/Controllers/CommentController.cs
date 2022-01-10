@@ -23,7 +23,7 @@ namespace API.Controllers
         }
 
         [HttpPost("{id}")]
-        public async Task<ActionResult<ApiResponse>> PostComment([FromRoute] string id, [FromBody] CommentModel comment)
+        public async Task<IActionResult> PostComment([FromRoute] string id, [FromBody] CommentModel comment)
         {
             var profileUser = await userService.GetUserModelById(id);
             var commentUser = await userService.GetUserModelById(User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier).Value);

@@ -19,7 +19,7 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<ApiResponse>> GetDashboard()
+        public async Task<IActionResult> GetDashboard()
         {
             var dashboard = await dashboardService.GetDashboard();
             return Ok(ApiResponse.Ok().AddData("dashboard", dashboard));

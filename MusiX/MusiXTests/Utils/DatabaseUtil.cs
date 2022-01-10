@@ -52,29 +52,7 @@ namespace MusiXTests.Utils
             return new RoleManager<IdentityRole>(store, roles,
                 MockLookupNormalizer(),
                 new IdentityErrorDescriber(),
-                null);
-        }
-
-        public static SignInManager<IdentityUser> CreateSignInManager(UserManager<IdentityUser> userManager)
-        {
-            var context = new DefaultHttpContext();
-            var auth = new Mock<IAuthenticationService>();
-            auth.Setup(a => a.SignInAsync(context, IdentityConstants.ApplicationScheme,
-                It.IsAny<ClaimsPrincipal>(),
-                It.IsAny<AuthenticationProperties>())).Returns(Task.FromResult(0)).Verifiable();
-            var contextAccessor = new Mock<IHttpContextAccessor>();
-            contextAccessor.Setup(a => a.HttpContext).Returns(context);
-            var options = new Mock<IOptions<IdentityOptions>>();
-            var idOptions = new IdentityOptions();
-            idOptions.Lockout.AllowedForNewUsers = false;
-            options.Setup(o => o.Value).Returns(idOptions);
-            return new SignInManager<IdentityUser>(userManager,
-                 contextAccessor.Object,
-                 new Mock<IUserClaimsPrincipalFactory<IdentityUser>>().Object,
-                 options.Object,
-                 new Mock<ILogger<SignInManager<IdentityUser>>>().Object,
-                 new Mock<IAuthenticationSchemeProvider>().Object,
-                 new Mock<IUserConfirmation<IdentityUser>>().Object);
+                new Mock<ILogger<RoleManager<IdentityRole>>>().Object);
         }
 
         private static ILookupNormalizer MockLookupNormalizer()

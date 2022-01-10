@@ -4,6 +4,7 @@ using API.Models;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace API.DataAccess
@@ -49,12 +50,12 @@ namespace API.DataAccess
                 .ForMember(dest => dest.JoinDate, opt => opt.MapFrom(src => src.CreationDate))
                 .ForMember(dest => dest.Following, opt => opt.MapFrom(src => src.Following.Select(user => user.Id)))
                 .ForMember(dest => dest.Followers, opt => opt.MapFrom(src => src.Followers.Select(user => user.Id)))
-                .ForMember(dest => dest.Comments, opt => opt.MapFrom(src => src.ProfileComments.Select(comment => new ProfileCommentModel() {
-                        Id = comment.CommentUser.Id,
-                        Name = comment.CommentUser.Name,
-                        Comment = comment.Comment
-                    }).ToList()
-                ))
+                .ForAllOtherMembers(opt => opt.Ignore());
+
+            CreateMap<ProfileComment, ProfileCommentModel>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.CommentUser.Id))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.CommentUser.Name))
+                .ForMember(dest => dest.Comment, opt => opt.MapFrom(src => src.Comment))
                 .ForAllOtherMembers(opt => opt.Ignore());
         }
     }

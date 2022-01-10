@@ -21,28 +21,28 @@ namespace API.Controllers
         }
 
         [HttpGet("popular-artists")]
-        public async Task<ActionResult<ApiResponse>> GetMostPopularArtists()
+        public async Task<IActionResult> GetMostPopularArtists()
         {
             var artists = await scrobbleService.GetMostPopularArtists();
             return Ok(ApiResponse.Ok().AddData("artists", artists));
         }
 
         [HttpGet("popular-albums")]
-        public async Task<ActionResult<ApiResponse>> GetMostPopularAlbums()
+        public async Task<IActionResult> GetMostPopularAlbums()
         {
             var albums = await scrobbleService.GetMostPopularAlbums();
             return Ok(ApiResponse.Ok().AddData("albums", albums));
         }
 
         [HttpGet("popular-tracks")]
-        public async Task<ActionResult<ApiResponse>> GetMostPopularTracks()
+        public async Task<IActionResult> GetMostPopularTracks()
         {
             var tracks = await scrobbleService.GetMostPopularTracks();
             return Ok(ApiResponse.Ok().AddData("tracks", tracks));
         }
 
         [HttpGet("{userId}/artists")]
-        public async Task<ActionResult<ApiResponse>> GetUserScrobbledArtists([FromRoute] string userId, [FromQuery] string from, [FromQuery] string to)
+        public async Task<IActionResult> GetUserScrobbledArtists([FromRoute] string userId, [FromQuery] string from, [FromQuery] string to)
         {
             var fromDate = DateTime.ParseExact(from, "yyyy-MM-dd", CultureInfo.InvariantCulture);
             var toDate = DateTime.ParseExact(to, "yyyy-MM-dd", CultureInfo.InvariantCulture);
@@ -52,7 +52,7 @@ namespace API.Controllers
         }
 
         [HttpGet("{userId}/albums")]
-        public async Task<ActionResult<ApiResponse>> GetUserScrobbledAlbums([FromRoute] string userId, [FromQuery] string from, [FromQuery] string to)
+        public async Task<IActionResult> GetUserScrobbledAlbums([FromRoute] string userId, [FromQuery] string from, [FromQuery] string to)
         {
             var fromDate = DateTime.ParseExact(from, "yyyy-MM-dd", CultureInfo.InvariantCulture);
             var toDate = DateTime.ParseExact(to, "yyyy-MM-dd", CultureInfo.InvariantCulture);
@@ -62,7 +62,7 @@ namespace API.Controllers
         }
 
         [HttpGet("{userId}/tracks")]
-        public async Task<ActionResult<ApiResponse>> GetUserScrobbledTracks([FromRoute]string userId, [FromQuery]string from, [FromQuery]string to)
+        public async Task<IActionResult> GetUserScrobbledTracks([FromRoute]string userId, [FromQuery]string from, [FromQuery]string to)
         {
             var fromDate = DateTime.ParseExact(from, "yyyy-MM-dd", CultureInfo.InvariantCulture);
             var toDate = DateTime.ParseExact(to, "yyyy-MM-dd", CultureInfo.InvariantCulture);

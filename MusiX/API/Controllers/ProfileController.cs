@@ -23,7 +23,7 @@ namespace API.Controllers
 
         [HttpGet("{id}")]
         [AllowAnonymous]
-        public async Task<ActionResult<ApiResponse>> GetProfileById([FromRoute] string id)
+        public async Task<IActionResult> GetProfileById([FromRoute] string id)
         {
             var profile = await profileService.GetProfileById(id);
             return Ok(ApiResponse.Ok().AddData("profile", profile));
@@ -32,7 +32,7 @@ namespace API.Controllers
 
         [HttpGet("search/{search}")]
         [AllowAnonymous]
-        public async Task<ActionResult<ApiResponse>> GetProfilesBySearchQuery([FromRoute] string search)
+        public async Task<IActionResult> GetProfilesBySearchQuery([FromRoute] string search)
         {
             if (string.IsNullOrWhiteSpace(search))
                 return BadRequest(ApiResponse.Error("No Given Search String"));
@@ -43,7 +43,7 @@ namespace API.Controllers
 
         [HttpPut("follow/{id}")]
         [Authorize]
-        public async Task<ActionResult<ApiResponse>> Follow([FromRoute] string id)
+        public async Task<IActionResult> Follow([FromRoute] string id)
         {
             var followingUser = await userService.GetUserModelById(User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier).Value);
             var followedUser = await userService.GetUserModelById(id);
@@ -59,7 +59,7 @@ namespace API.Controllers
 
         [HttpPut("unfollow/{id}")]
         [Authorize]
-        public async Task<ActionResult<ApiResponse>> Unfollow([FromRoute] string id)
+        public async Task<IActionResult> Unfollow([FromRoute] string id)
         {
             var followingUser = await userService.GetUserModelById(User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier).Value);
             var followedUser = await userService.GetUserModelById(id);
